@@ -1,0 +1,347 @@
+                               MongoDB Day-2 Task
+
+ Design database for Zen class programme
+  users
+  codekata
+  attendance
+  topics
+  tasks
+  company_drives
+  mentors
+
+1.users Collection:[
+{
+  "_id": ObjectId("user_id"), //primary key
+  "username": "john",
+  "email": "john@example.com",
+  "name": "John",
+  "role": "student" // or "mentor"
+},
+{
+  "_id": ObjectId("user_id"),,
+  "username": "alex",
+  "email": "alex@example.com",
+  "name": "alex",
+  "role": "student" // or "mentor"
+},
+{
+  "_id": ObjectId("user_id"),,
+  "username": "sam",
+  "email": "sam@example.com",
+  "name": "sam",
+  "role": "student" // or "mentor"
+}
+]
+
+2.codekata Collection:[
+
+{
+  "_id": ObjectId("codekata_id"), //primary key
+  "title": "Binary Search",
+  "description": "Implement the binary search algorithm",
+  "difficulty": "medium",
+  "language": "python"
+},
+{
+  "_id": ObjectId("codekata_id"),
+  "title": "Numbers",
+  "description": "solve the problems using math function",
+  "difficulty": "medium",
+  "language": "javascript"
+},
+{
+  "_id": ObjectId("codekata_id"),
+  "title": "Sorting",
+  "description": "use sorting in-build functions",
+  "difficulty": "easy",
+  "language": "javascript"
+}
+]
+
+3. attendance Collection:[
+
+{
+  "_id": ObjectId("attendance_id"), //primary key
+  "user_id": ObjectId("user_id"),                 //foreign key to Users
+  "date": ISODate("2020-09-07T00:00:00Z"),
+  "present": true
+},
+{
+  "_id": ObjectId("attendance_id"),
+  "user_id": ObjectId("user_id"),
+  "date": ISODate("2020-09-07T00:00:00Z"),
+  "present": true
+},
+{
+  "_id": ObjectId("attendance_id"),
+  "user_id": ObjectId("user_id"),
+  "date": ISODate("2020-09-07T00:00:00Z"),
+  "present": true
+}
+]
+
+4.topics Collection:[
+
+{
+  "_id": ObjectId("topic_id"),   //primary key
+  "title": "Database",
+  "description": "Introduction to mongoDB",
+  "start_date": ISODate("2020-09-01T00:00:00Z"),
+  "end_date": ISODate("2020-09-10T00:00:00Z")
+},
+{
+  "_id": ObjectId("topic_id"),
+  "title": "Javascript",
+  "description": "Introduction to Javascript",
+  "start_date": ISODate("2020-09-01T00:00:00Z"),
+  "end_date": ISODate("2020-09-10T00:00:00Z")
+},
+{
+  "_id": ObjectId("topic_id"),
+  "title": "React",
+  "description": "Introduction to React",
+  "start_date": ISODate("2020-09-01T00:00:00Z"),
+  "end_date": ISODate("2020-09-10T00:00:00Z")
+}
+]
+
+5.tasks Collection:[
+
+{
+  "_id": ObjectId("task_id"),  //primary key
+  "topic_id": ObjectId("topic_id"),                         //foreign key to Topics
+  "description": "create a database design for zen class",
+  "due_date": ISODate("2020-09-05T00:00:00Z")
+},
+{
+  "_id": ObjectId("task_id"),
+  "topic_id": ObjectId("topic_id"),
+  "description": "write a program using IIFE",
+  "due_date": ISODate("2020-09-05T00:00:00Z")
+},
+{
+  "_id": ObjectId("task_id"),
+  "topic_id": ObjectId("topic_id"),
+  "description": "design react app",
+  "due_date": ISODate("2020-09-05T00:00:00Z")
+}
+]
+
+6.company_drives Collection:[
+
+{
+  "_id": ObjectId("drive_id"),
+  "company_name": "TechCorp",
+  "date": ISODate("2020-09-20T00:00:00Z"),
+  "location": "Virtual",
+  "positions": 5
+},
+{
+  "_id": ObjectId("drive_id"),
+  "company_name": "InfoTech",
+  "date": ISODate("2020-10-20T00:00:00Z"),
+  "location": "Virtual",
+  "positions": 6
+},
+{
+  "_id": ObjectId("drive_id"),
+  "company_name": "CTS",
+  "date": ISODate("2020-15-20T00:00:00Z"),
+  "location": "Virtual",
+  "positions": 3
+}
+
+]
+
+7.mentors Collection:[
+
+{
+  "_id": ObjectId("mentor_id"),
+  "name": "Jane Smith",
+  "email": "jane@example.com",
+  "specialization": "Algorithms"
+},
+{
+  "_id": ObjectId("mentor_id"),
+  "name": "Smith",
+  "email": "Smith@example.com",
+  "specialization": "DSA"
+},
+{
+  "_id": ObjectId("mentor_id"),
+  "name": "Jack",
+  "email": "jack@example.com",
+  "specialization": "Backend Framework"
+}
+]
+
+   1.Find all the topics and tasks which are thought in the month of October.
+
+Query: db.topics.aggregate([
+  {
+    $match: {
+      start_date: {
+        $gte: ISODate('2020-10-01T00:00:00Z'),
+        $lt: ISODate('2020-11-01T00:00:00Z')
+      }
+    }
+  },
+  {
+    $lookup: {
+      from: 'tasks',
+      localField: '_id',
+      foreignField: 'topic_id',
+      as: 'tasks'
+    }
+  }
+])
+
+  2.Find all the company drives which appeared between 15 oct-2020 and 31-oct-2020
+
+ Query: db.company_drives.aggregate([
+  {
+    $match: {
+      date: {
+        $gte: ISODate('2020-10-15T00:00:00Z'),
+        $lte: ISODate('2020-10-31T23:59:59Z')
+      }
+    }
+  }
+])
+
+  3.Find all the company drives and students who are appeared for the placement.
+
+ Query: db.company_drives.aggregate([
+  {
+    $lookup: {
+      from: "attendance",
+      localField: "_id",
+      foreignField: "drive_id",
+      as: "attendances"
+    }
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "attendances.user_id",
+      foreignField: "_id",
+      as: "students"
+    }
+  },
+  {
+    $project: {
+      _id: 1,
+      company_name: 1,
+      date: 1,
+      location: 1,
+      positions: 1,
+      students: {
+        $map: {
+          input: "$students",
+          as: "student",
+          in: {
+            _id: "$$student._id",
+            username: "$$student.username",
+            name: "$$student.name"
+          }
+        }
+      }
+    }
+  }
+])
+
+  4.Find the number of problems solved by the user in codekata
+
+ Query: db.attendance.aggregate([
+  {
+    $match: {
+      user_id: user_id
+    }
+  },
+  {
+    $lookup: {
+      from: "tasks",
+      localField: "topic_id",
+      foreignField: "topic_id",
+      as: "tasks"
+    }
+  },
+  {
+    $unwind: "$tasks"
+  },
+  {
+    $group: {
+      _id: "$user_id",
+      totalProblemsSolved: {
+        $sum: 1
+      }
+    }
+  }
+]);
+
+ 5.Find all the mentors with who has the mentee's count more than 15
+
+ Query: db.mentors.aggregate([
+  {
+    $addFields: {
+      menteeCount: { $size: "$mentees" } // Add a field to each mentor document representing the count of mentees
+    }
+  },
+  {
+    $match: {
+      menteeCount: { $gt: 15 } // Filter mentors with more than 15 mentees
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      name: 1,
+      email: 1,
+      speciality: 1,
+      menteeCount: 1
+    }
+  }
+]);
+
+ 6.Find the number of users who are absent and task is not submitted  between 15 oct-2020 and 31-oct-2020
+
+ Query: db.users.aggregate([
+  {
+    $lookup: {
+      from: "attendance",
+      localField: "_id",
+      foreignField: "user_id",
+      as: "attendanceRecords"
+    }
+  },
+  {
+    $match: {
+      $and: [
+        { "attendanceRecords.date": { $gte:'2020-10-15T00:00:00Z', $lte:'2020-10-31T23:59:59Z' } },
+        { "attendanceRecords.present": false }
+      ]
+    }
+  },
+  {
+    $lookup: {
+      from: "tasks",
+      localField: "attendanceRecords.topic_id",
+      foreignField: "topic_id",
+      as: "tasks"
+    }
+  },
+  {
+    $match: {
+      "tasks": { $exists: false }
+    }
+  },
+  {
+    $count: "absent_users"
+  }
+]);
+
+
+
+
+
+
